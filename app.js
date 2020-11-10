@@ -5,6 +5,7 @@ const cors = require('cors')
 const passport = require('passport')
 const path = require('path')
 const users = require('./routes/users')
+const admin = require('./routes/admin')
 
 const db = "mongodb+srv://netninja:test1234@cluster0.krott.mongodb.net/auth?retryWrites=true&w=majority"
 
@@ -37,6 +38,20 @@ app.get('/',(req,res)=>{
     })
 })
 
+// Create a custom middleware function
+const checkUserType = function(req,res,next){
+    const userType = req.originalUrl.split('/')[2]
+
+   //Bring in the passport authetication strategy
+    require('./config/passport')(userType , passport)
+
+    next();
+}
+
+app.use(checkUserType);
 // Bring in the user route
 app.use('/api', users)
+
+// Bring in the admin route
+app.use('/api/admin',admin)
 
